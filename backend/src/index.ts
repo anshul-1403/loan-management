@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
+import mongoose from 'mongoose';
 import { connectDB } from './config/db';
 import { seedIfEmpty } from './utils/seeder';
 import authRoutes from './routes/authRoutes';
@@ -29,6 +30,19 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'OK', message: 'CrediSea Backend is running smoothly.' });
+});
+
+// Debug DB connection endpoint
+app.get('/api/debug-db', (req: Request, res: Response) => {
+  const isInMemory = !process.env.MONGODB_URI || mongoose.connection.host.includes('127.0.0.1') || mongoose.connection.host.includes('localhost');
+  res.status(200).json({
+    status: 'OK',
+    connected: mongoose.connection.readyState === 1,
+    host: mongoose.connection.host,
+    dbName: mongoose.connection.db?.databaseName || 'unknown',
+    hasEnvUri: !!process.env.MONGODB_URI,
+    isInMemoryFallback: isInMemory
+  });
 });
 
 // Register routes
