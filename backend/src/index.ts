@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import mongoose from 'mongoose';
-import { connectDB } from './config/db';
+import { connectDB, dbError } from './config/db';
 import { seedIfEmpty } from './utils/seeder';
 import authRoutes from './routes/authRoutes';
 import loanRoutes from './routes/loanRoutes';
@@ -41,7 +41,8 @@ app.get('/api/debug-db', (req: Request, res: Response) => {
     host: mongoose.connection.host,
     dbName: mongoose.connection.db?.databaseName || 'unknown',
     hasEnvUri: !!process.env.MONGODB_URI,
-    isInMemoryFallback: isInMemory
+    isInMemoryFallback: isInMemory,
+    connectionError: dbError
   });
 });
 

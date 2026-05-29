@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 let mongod: any = null;
+export let dbError: string | null = null;
 
 export const connectDB = async (): Promise<void> => {
   try {
@@ -13,7 +14,9 @@ export const connectDB = async (): Promise<void> => {
       serverSelectionTimeoutMS: 3000,
     });
     console.log(`MongoDB Connected successfully to host: ${mongoose.connection.host}`);
+    dbError = null;
   } catch (error) {
+    dbError = (error as Error).message;
     console.log(`\n[Database Warn] Failed to connect to local MongoDB: ${(error as Error).message}`);
     console.log(`[Database Info] Spinning up a fallback in-memory MongoDB Server instead...`);
     
